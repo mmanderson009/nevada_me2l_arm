@@ -1,8 +1,11 @@
+/* 
+ *  BASE FUNCTIONS CREATED BY: Alex's Mearm code Serial Control Code 04/04/2015 (c)
+*/
+
+
 #include <IRremote.h>
 #include <IRremoteInt.h>
 #include <Servo.h>
-
-//Jamie was here
 
 int RECV_PIN = 11;
 IRrecv irrecv(RECV_PIN);
