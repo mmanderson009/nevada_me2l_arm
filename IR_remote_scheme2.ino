@@ -2,6 +2,8 @@
 #include <IRremoteInt.h>
 #include <Servo.h>
 
+//Jamie was here
+
 int RECV_PIN = 11;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
