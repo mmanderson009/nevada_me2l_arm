@@ -39,77 +39,56 @@ void loop()
 {
    int x = analogRead(pin_x);   
    int y = analogRead(pin_y);
+   int baseDir = 0;
+   int armDir = 0;
 
    if(x > 520)
     {
-      moveBaseRight(); 
+      baseDir = -1;
     } else if(x < 480)
     {
-      moveBaseLeft();
+      baseDir = 1;
     }
     if( y > 520 )
     {
-     moveArmForwards();
+      armDir = 1;
     } else if( y < 480 )
     {
-     moveArmBackwards();
+      armDir = -1;
     }
-   // delay(2000);
+    moveBase(baseDir); 
+    moveArm(armDir);
 }
 
-void moveBaseLeft()
+void moveBase(int dir)
 {
   Serial.print("Moving base left ");
   Serial.println();
   Serial.print("BasePos Value: ");
   Serial.print(basePos);
   Serial.println();
+  basePos = basePos + dir;
+  //Just in case it goes past 180
+  if (basePos >= 180)
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+    basePos = 180;
+  }
+  else if( basePos <= 0 )
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+    basePos = 0;
+  }
 
-  
-  if (basePos >= 0 && basePos != 180)
-    {
-      basePos = basePos + 1;
-      base.write(basePos);
-      delay(15);
-    }
-  
-  if (basePos == 180)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-      
-    }
-      
+  base.write(basePos);
+  delay(15);    
   Serial.flush();
 
 }
-
-void moveBaseRight()
-{
-  Serial.print("Moving base right ");
-  Serial.println();
-  Serial.print("BasePos Value: ");
-  Serial.print(basePos);
-  Serial.println();
   
-  if (basePos <= 180 && basePos != 0)
-    {
-      basePos = basePos - 1;
-      base.write(basePos);
-      delay(15);
-    }
-  
-  if (basePos == 0)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-    }
-    
-  Serial.flush();
- 
-}
-  
-void moveArmForwards()
+void moveArm(int dir)
 {
   Serial.print("Moving Arm Forwards ");
   Serial.println();
@@ -117,56 +96,32 @@ void moveArmForwards()
   Serial.print("armPos Value: ");
   Serial.print(armPos);
   Serial.println();
-  
-  if (armPos >=40 && armPos != 180)
-    {
-      armPos = armPos + 1;
-      arm.write(armPos);
-      delay(15);
-    }
+  armPos = armPos + dir;
+
+  if (armPos >= 180)
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+    armPos = 180;
+  }
+  else if( basePos <= 40 )
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+    armPos = 40;
+  }
+
+  arm.write(armPos);
 
   if( armPos > 145 )
   {
     wrist.write(150);
   }
 
-  if (armPos == 180)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println(); 
-    }
-    
+  delay(15);
+  
   Serial.flush();
   
-}
-
-void moveArmBackwards()
-{
-  Serial.print("Moving Arm backwards ");
-  Serial.println();
-  
-  Serial.print("armPos Value: ");
-  Serial.print(armPos);
-  Serial.println();
-
-
-  if (armPos <= 180 && armPos != 40)
-    {
-      armPos = armPos - 1;
-      arm.write(armPos);
-      delay(15);
-    }
-
-
-  
-  if (armPos == 40)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-    }
-     
-  Serial.flush();
- 
 }
  
 void moveWristUp()
@@ -180,17 +135,17 @@ void moveWristUp()
   Serial.println();
     
   if (wristPos >= 70 && wristPos != 165)
-    {
-      wristPos = wristPos + 1;
-      wrist.write(wristPos);
-      delay(15);
-    }
+  {
+    wristPos = wristPos + 1;
+    wrist.write(wristPos);
+    delay(15);
+  }
   
   if (wristPos == 165)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-    }
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+  }
       
   Serial.flush();
 
@@ -208,18 +163,19 @@ void moveWristDown()
   if( armPos == 70 )
   {
       
-  } else if (wristPos <= 165 && wristPos != 70)
-    {
-      wristPos = wristPos - 1;
-      wrist.write(wristPos);
-      delay(15);
-    }
+  } 
+  else if (wristPos <= 165 && wristPos != 70)
+  {
+    wristPos = wristPos - 1;
+    wrist.write(wristPos);
+    delay(15);
+  }
   
   if (wristPos == 70)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-    }    
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+  }    
   Serial.flush();
  
 }
