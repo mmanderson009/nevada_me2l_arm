@@ -31,6 +31,17 @@ void setup()
   gripper.attach(6);
   gripper.write(60);
 
+////////////
+// BUTTONS
+//
+// on/off pin 0
+// wrist pin 2
+// claw pin 4
+// 
+///////////
+
+  //Add in button set up
+
   Serial.print("Let's start!");
   Serial.println();
 }
@@ -58,6 +69,11 @@ void loop()
     }
     moveBase(baseDir); 
     moveArm(armDir);
+      //check buttons
+        //on/off functions already written
+        //claw functions already written
+        //alter wrist functions?
+    //add in interrupts?
 }
 
 void moveBase(int dir)
@@ -162,7 +178,7 @@ void moveWristDown()
 
   if( armPos == 70 )
   {
-      
+      //??? ask merc
   } 
   else if (wristPos <= 165 && wristPos != 70)
   {
@@ -215,17 +231,17 @@ void openGripper()
   Serial.println();
     
   if (gripperPos <= 40 && gripperPos != 0)
-    {
-      gripperPos--;
-      gripper.write(gripperPos);
-      delay(15);
-    }
+  {
+    gripperPos--;
+    gripper.write(gripperPos);
+    delay(15);
+  }
   
   if (gripperPos == 0)
-    {
-      Serial.print("Reached end of travel....stopping");
-      Serial.println();
-    }       
+  {
+    Serial.print("Reached end of travel....stopping");
+    Serial.println();
+  }       
   Serial.flush();
   
 }
