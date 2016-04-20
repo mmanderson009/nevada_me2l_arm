@@ -31,16 +31,9 @@ void setup()
   gripper.attach(6);
   gripper.write(60);
 
-////////////
-// BUTTONS
-//
-// on/off pin 0
-// wrist pin 2
-// claw pin 4
-// 
-///////////
-
-  //Add in button set up
+  pinMode(0, INPUT); //on/of button
+  pinMode(2, INPUT); //wrist button
+  pinMode(4, INPUT); //claw button
 
   Serial.print("Let's start!");
   Serial.println();
@@ -48,10 +41,20 @@ void setup()
 
 void loop()
 {
+   //Check joystick
    int x = analogRead(pin_x);   
    int y = analogRead(pin_y);
+
+   //Check buttons
+   int onOFF = digitalRead(0);
+   int wrist = digitalRead(2);
+   int claw = digitalRead(4);
+
+   //Set initial values for direction
    int baseDir = 0;
    int armDir = 0;
+
+   //TODO Call on/off before anything else
 
    if(x > 520)
     {
@@ -67,13 +70,18 @@ void loop()
     {
       armDir = -1;
     }
+
+    //Call functions with direction values
     moveBase(baseDir); 
     moveArm(armDir);
-      //check buttons
+
+    //TODO Toggle claw?
+
+    //TODO Toggle Wrist?
         //on/off functions already written
         //claw functions already written
-        //alter wrist functions?
-    //add in interrupts?
+        //TODO alter wrist functions?
+    //TODO add in interrupts?
 }
 
 void moveBase(int dir)
