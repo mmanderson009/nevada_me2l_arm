@@ -14,6 +14,9 @@ int basePos = 90;
 int armPos = 90; //RIGHT is arm
 int wristPos = 90; //LEFT is wrist
 int gripperPos = 15;
+bool gripperState = false;
+bool wristState = false;
+bool powerState = true;
 
 void setup()
 {
@@ -47,22 +50,64 @@ void loop()
 
    //Check buttons
    int onOFF = digitalRead(0);
-   int wrist = digitalRead(2);
-   int claw = digitalRead(4);
+   int wristRead = digitalRead(2);
+   int gripperRead = digitalRead(4);
 
    //Set initial values for direction
    int baseDir = 0;
    int armDir = 0;
 
-   //TODO Call on/off before anything else
+   if( onOFF )
+   {
+      if( powerState )
+      {
+         stopMoving();
+         powerState = false;
+      }
+      else
+      {
+         startMoving();
+         powerState = true;
+      }
+   }
 
-   if(x > 520)
+   if( wristRead )
+   {
+      if( wristState )
+      {
+         moveWristUp();
+         wristState = false;
+      }
+      else
+      {
+         moveWristDown();
+         wristState = true;
+      }
+   }
+
+   if( gripperRead )
+   {
+      if( gripperState )
+      {
+         openGripper();
+         gripperState = false;
+      }
+      else
+      {
+         closeGripper()
+         gripperState = true;
+      }
+   }
+
+
+    if(x > 520)
     {
       baseDir = -1;
     } else if(x < 480)
     {
       baseDir = 1;
     }
+
     if( y > 520 )
     {
       armDir = 1;
@@ -75,12 +120,7 @@ void loop()
     moveBase(baseDir); 
     moveArm(armDir);
 
-    //TODO Toggle claw?
-
-    //TODO Toggle Wrist?
-        //on/off functions already written
-        //claw functions already written
-        //TODO alter wrist functions?
+    //TODO alter wrist functions?
     //TODO add in interrupts?
 }
 
