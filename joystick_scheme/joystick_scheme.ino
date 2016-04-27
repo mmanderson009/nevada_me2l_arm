@@ -10,10 +10,10 @@ int pin_y = 1;
 Servo base, arm, wrist, gripper;
 
 /*  SET TO PARTICULAR VALUES TO PREVENT MOVEMENT AT START */
-int basePos = 90;
-int armPos = 90; //RIGHT is arm
-int wristPos = 90; //LEFT is wrist
-int gripperPos = 15;
+int basePos;
+int armPos; //RIGHT is arm
+int wristPos; //LEFT is wrist
+int gripperPos;
 bool gripperState = false;
 bool wristState = false;
 bool powerState = true;
@@ -21,6 +21,11 @@ bool powerState = true;
 void setup()
 {
   Serial.begin(9600);
+
+  basePos = 90;
+  armPos = 90; //RIGHT is arm
+  wristPos = 150; //LEFT is wrist
+  gripperPos = 180;
 
   base.attach(9);
   base.write(90);
@@ -57,36 +62,37 @@ void loop()
    int baseDir = 0;
    int armDir = 0;
 
-   if( onOFF )
+   if( !onOFF )
    {
       if( powerState )
       {
-         stopMoving();
+         //stopMoving();
          powerState = false;
       }
       else
       {
-         startMoving();
+         //startMoving();
          powerState = true;
       }
    }
 
-   if( wristRead )
+   if( !wristRead )
    {
       if( wristState )
       {
-         moveWristUp();
+         //moveWristUp();
          wristState = false;
       }
       else
       {
-         moveWristDown();
+         //moveWristDown();
          wristState = true;
       }
    }
-
+/*
    if( gripperRead )
    {
+      Serial.print(gripperRead);
       if( gripperState )
       {
          openGripper();
@@ -94,43 +100,33 @@ void loop()
       }
       else
       {
-         closeGripper()
-         gripperState = true;
+         //closeGripper();
+         //gripperState = true;
       }
    }
-
+*/
 
     if(x > 520)
     {
-      baseDir = -1;
+      moveBase(-1);
     } else if(x < 480)
     {
-      baseDir = 1;
+      moveBase(1);
     }
 
     if( y > 520 )
     {
-      armDir = 1;
+      moveArm(1);
+      delay(10);
     } else if( y < 480 )
     {
-      armDir = -1;
+      moveArm(-1);
+      delay(10);
     }
-
-    //Call functions with direction values
-    moveBase(baseDir); 
-    moveArm(armDir);
-
-    //TODO alter wrist functions?
-    //TODO add in interrupts?
 }
 
 void moveBase(int dir)
 {
-  Serial.print("Moving base left ");
-  Serial.println();
-  Serial.print("BasePos Value: ");
-  Serial.print(basePos);
-  Serial.println();
   basePos = basePos + dir;
   //Just in case it goes past 180
   if (basePos >= 180)
@@ -146,20 +142,13 @@ void moveBase(int dir)
     basePos = 0;
   }
 
-  base.write(basePos);
-  delay(15);    
+  base.write(basePos);    
   Serial.flush();
 
 }
   
 void moveArm(int dir)
 {
-  Serial.print("Moving Arm Forwards ");
-  Serial.println();
-  
-  Serial.print("armPos Value: ");
-  Serial.print(armPos);
-  Serial.println();
   armPos = armPos + dir;
 
   if (armPos >= 180)
@@ -168,7 +157,7 @@ void moveArm(int dir)
     Serial.println();
     armPos = 180;
   }
-  else if( basePos <= 40 )
+  else if( armPos <= 40 )
   {
     Serial.print("Reached end of travel....stopping");
     Serial.println();
@@ -181,8 +170,6 @@ void moveArm(int dir)
   {
     wrist.write(150);
   }
-
-  delay(15);
   
   Serial.flush();
   
@@ -202,7 +189,6 @@ void moveWristUp()
   {
     wristPos = wristPos + 1;
     wrist.write(wristPos);
-    delay(15);
   }
   
   if (wristPos == 165)
@@ -232,7 +218,6 @@ void moveWristDown()
   {
     wristPos = wristPos - 1;
     wrist.write(wristPos);
-    delay(15);
   }
   
   if (wristPos == 70)
@@ -248,23 +233,25 @@ void closeGripper()
 {
 //The exported expects 60 - 180 as an angle. Not 0 to 40
   Serial.print("Closing Gripper Jaws ");
-  Serial.println();  
+  /*Serial.println();  
   Serial.print("gripperPos Value: ");
   Serial.print(gripperPos);
   Serial.println();
     
-  if (gripperPos >= 0 && gripperPos != 40)
+  if (gripperPos >= 60 && gripperPos <= 180)
     {
       gripperPos++;
       gripper.write(gripperPos);
-      delay(15);
     }
   
-  if (gripperPos == 40)
+  if (gripperPos == 180)
     {
       Serial.print("Reached end of travel....stopping");
       Serial.println();
     }
+*/
+  gripperPos = 180;
+  gripper.write(gripperPos);
       
   Serial.flush();
  
@@ -273,23 +260,27 @@ void closeGripper()
 void openGripper()
 {
   Serial.print("Opening Gripper Jaws ");
-  Serial.println(); 
+  /*Serial.println(); 
   Serial.print("gripperPos Value: ");
   Serial.print(gripperPos);
   Serial.println();
-    
-  if (gripperPos <= 40 && gripperPos != 0)
+  
+  if (gripperPos <= 180 && gripperPos != 60)
   {
     gripperPos--;
     gripper.write(gripperPos);
-    delay(15);
   }
   
-  if (gripperPos == 0)
+  
+  if (gripperPos == 60)
   {
     Serial.print("Reached end of travel....stopping");
     Serial.println();
   }       
+  */
+
+  gripperPos = 60;
+  gripper.write(gripperPos);
   Serial.flush();
   
 }
@@ -308,8 +299,6 @@ void startMoving()
  
   Serial.flush();
  
-  delay(15);
- 
 }
 
 
@@ -324,8 +313,6 @@ void stopMoving()
   gripper.detach();
   
   Serial.flush();
- 
-  delay(15);
  
 }
 
