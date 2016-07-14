@@ -115,7 +115,7 @@ void moveBaseLeft()
   
   if (basePos >= 0 && basePos != 180)
     {
-      basePos = basePos + 45;
+      basePos = basePos + 1;
       base.write(basePos);
       delay(15);
     }
@@ -141,7 +141,7 @@ void moveBaseRight()
   
   if (basePos <= 180 && basePos != 0)
     {
-      basePos = basePos - 45;
+      basePos = basePos - 1;
       base.write(basePos);
       delay(15);
     }
@@ -169,7 +169,7 @@ void moveArmForwards()
   
   if (armPos >=40 && armPos != 180)
     {
-      armPos = armPos + 10;
+      armPos = armPos + 1;
       arm.write(armPos);
       delay(15);
     }
@@ -207,7 +207,7 @@ void moveArmBackwards()
     
   } else if (armPos <= 180 && armPos != 40)
     {
-      armPos = armPos - 10;
+      armPos = armPos - 1;
       arm.write(armPos);
       delay(15);
     }
@@ -236,7 +236,7 @@ void moveWristUp()
     
   if (wristPos >= 70 && wristPos != 165)
     {
-      wristPos = wristPos + 5;
+      wristPos = wristPos + 1;
       wrist.write(wristPos);
       delay(15);
     }
@@ -265,7 +265,7 @@ void moveWristDown()
       
   } else if (wristPos <= 165 && wristPos != 70)
     {
-      wristPos = wristPos - 5;
+      wristPos = wristPos - 1;
       wrist.write(wristPos);
       delay(15);
     }
