@@ -68,7 +68,7 @@ int WRIST[TOGGLE_SIZE];
 //Initial angles for all the servos. Arm should be parallel with the ground.
 const int INITANGLE[NUM_SERVOS] = {BASE[baseIndex], ARM[1][0][0], ARM[2][0][0], CLAW[clawIndex]};
 
-bool update = false;                            //global variable for updating servo positions
+bool update;                           //global variable for updating servo positions
 
 //////////////////////////////////////////
 
@@ -80,18 +80,20 @@ bool update = false;                            //global variable for updating s
 //PARAMETERS: None.
 //RETURNS:    None.
 void setup()   {
-	Serial.begin(9600); //Begins the Serial for debugging. Viewable through Arduino IDE
+  Serial.begin(9600); //Begins the Serial for debugging. Viewable through Arduino IDE
 
 
  memcpy(WRIST, WRIST_START_POS, sizeof(WRIST)); //Initialize array for WRIST
+
+ update = false;
  
-	//Attach all the servo objects to the correct pins
+  //Attach all the servo objects to the correct pins
   //To be able to grab the right information for the servos
-	for (int i = 0; i < NUM_SERVOS; i++) {
-		myservo[i].attach(SERVO_PINS[i]); //Attaches servo to pin
-		myservo[i].write(INITANGLE[i]);   //Writes initial angle to servo
-		delay(500);                       //Time delay for safety
-	}
+  for (int i = 0; i < NUM_SERVOS; i++) {
+    myservo[i].attach(SERVO_PINS[i]); //Attaches servo to pin
+    myservo[i].write(INITANGLE[i]);   //Writes initial angle to servo
+    delay(500);                       //Time delay for safety
+  }
 }
 
 //FUNCTION:   basePos
@@ -102,23 +104,24 @@ void setup()   {
 //RETURNS:    None.
 void basePos(int analogValue)
 {
-	Serial.print("Base: ");
-	Serial.print(analogValue);
-	if (analogValue < LOW_JOYSTICK_VALUE)
-	{
-		baseIndex++;
-		if (baseIndex > 4)
-			baseIndex = 4;
+  Serial.print("Base: ");
+  Serial.print(analogValue);
+  if (analogValue < LOW_JOYSTICK_VALUE)
+  {
+    baseIndex++;
+    if (baseIndex > 4)
+      baseIndex = 4;
     update = true;
-	}
-	else if (analogValue > HIGH_JOYSTICK_VALUE)
-	{
-		baseIndex--;
-		if (baseIndex < 0)
-			baseIndex = 0;
+    while (analogRead(ANA[1]) > HIGH_JOYSTICK_VALUE || analogRead(ANA[1]) < LOW_JOYSTICK_VALUE);
+  }
+  else if (analogValue > HIGH_JOYSTICK_VALUE)
+  {
+    baseIndex--;
+    if (baseIndex < 0)
+      baseIndex = 0;
     update = true;
-	}
-	while (analogRead(ANA[1]) > HIGH_JOYSTICK_VALUE || analogRead(ANA[1]) < LOW_JOYSTICK_VALUE);
+    while (analogRead(ANA[1]) > HIGH_JOYSTICK_VALUE || analogRead(ANA[1]) < LOW_JOYSTICK_VALUE);
+  }
 }
 
 //FUNCTION:   horzPos
@@ -128,18 +131,24 @@ void basePos(int analogValue)
 //RETURNS:    None.
 void horzPos(int analogValue)
 {
-	Serial.print("Horz: ");
-	Serial.println(analogValue);
-	if (analogValue > HIGH_JOYSTICK_VALUE)
-	{
-		if (WRIST[0] == 0)
-			toggleWrist(0);
-	}
-	else if (analogValue < LOW_JOYSTICK_VALUE)
-	{
-		if (WRIST[0] == 1)
-			toggleWrist(0);
-	}
+  Serial.print("Horz: ");
+  Serial.println(analogValue);
+  if (analogValue > HIGH_JOYSTICK_VALUE)
+  {
+    if (WRIST[0] == 0)
+    {
+      toggleWrist(0);
+      while (analogRead(ANA[0]) > HIGH_JOYSTICK_VALUE || analogRead(ANA[0]) < LOW_JOYSTICK_VALUE);
+    }
+  }
+  else if (analogValue < LOW_JOYSTICK_VALUE)
+  {
+    if (WRIST[0] == 1)
+    {
+      toggleWrist(0);
+      while (analogRead(ANA[0]) > HIGH_JOYSTICK_VALUE || analogRead(ANA[0]) < LOW_JOYSTICK_VALUE);
+    }
+  }
 }
 
 //FUNCTION:   toggleWrist
@@ -149,10 +158,10 @@ void horzPos(int analogValue)
 //RETURNS:    None.
 void toggleWrist(int wristIndex)
 {
-	if (WRIST[wristIndex] == 0)
-		WRIST[wristIndex] = 1;
-	else if (WRIST[wristIndex] == 1)
-		WRIST[wristIndex] = 0;
+  if (WRIST[wristIndex] == 0)
+    WRIST[wristIndex] = 1;
+  else if (WRIST[wristIndex] == 1)
+    WRIST[wristIndex] = 0;
   update = true;
 }
 
@@ -164,10 +173,10 @@ void toggleWrist(int wristIndex)
 void toggleClaw()
 
 {
-	if (clawIndex == 0)
-		clawIndex = 1;
-	else if (clawIndex == 1)
-		clawIndex = 0;
+  if (clawIndex == 0)
+    clawIndex = 1;
+  else if (clawIndex == 1)
+    clawIndex = 0;
   update = true;
 }
 
@@ -179,18 +188,18 @@ void toggleClaw()
 //RETURNS:    None.
 void toggleOn()
 {
-	if(onOff == 1)
+  if(onOff == 1)
   {
-		stopMoving();
+    stopMoving();
     onOff = 0;
   }
-	else
+  else
   {
    memcpy(WRIST, WRIST_START_POS, sizeof(WRIST));
     baseIndex = BASE_START_POS;
     clawIndex = CLAW_START_POS;
     
-		startMoving();
+    startMoving();
     onOff = 1;
   }
   update = true;
@@ -204,14 +213,14 @@ void toggleOn()
 void startMoving()
 {
 
-	Serial.print("Start All Movement ");
-	Serial.println();
+  Serial.print("Start All Movement ");
+  Serial.println();
 
-	for (int i = 0; i < NUM_SERVOS; i++) {
-		myservo[i].attach(SERVO_PINS[i]);
-		myservo[i].write(INITANGLE[i]);
-		delay(500);
-	}
+  for (int i = 0; i < NUM_SERVOS; i++) {
+    myservo[i].attach(SERVO_PINS[i]);
+    myservo[i].write(INITANGLE[i]);
+    delay(500);
+  }
 }
 
 //FUNCTION:   stopMoving
@@ -223,11 +232,11 @@ void startMoving()
 //RETURNS:    None.
 void stopMoving()
 {
-	Serial.print("Stop All Movement ");
-	Serial.println();
+  Serial.print("Stop All Movement ");
+  Serial.println();
 
-	for (int i = 0; i < NUM_SERVOS; i++)
-		myservo[i].detach();
+  for (int i = 0; i < NUM_SERVOS; i++)
+    myservo[i].detach();
 }
 
 //FUNCTION:   debounce
@@ -240,17 +249,17 @@ void stopMoving()
 //RETURNS:    The debounced value.
 int debounce(int pin)
 {
-	int value = digitalRead(pin);
-	if ( value == 1 )
-	{
-		delay(100);
-		if (value == digitalRead(pin))
-		{
-			while (digitalRead(pin) == 1);
-			return 1;
-		}
-	}
-	return 0;
+  int value = digitalRead(pin);
+  if ( value == 1 )
+  {
+    delay(100);
+    if (value == digitalRead(pin))
+    {
+      while (digitalRead(pin) == 1);
+      return 1;
+    }
+  }
+  return 0;
 }
 
 //FUNCTION:   writeServos  
@@ -258,12 +267,13 @@ int debounce(int pin)
 //DETAILS:    Takes all the current positions and writes them to the servos
 //PARAMETERS: None.
 //RETURNS:    None.
+
 void writeServos()
 {
-	myservo[0].write(BASE[baseIndex]);
-	for (int i = 1; i < 3; i++)
-		myservo[i].write(ARM[i][WRIST[0]][WRIST[1]]);
-	myservo[3].write(CLAW[clawIndex]);
+  myservo[0].write(BASE[baseIndex]);
+  for (int i = 1; i < 3; i++)
+    myservo[i].write(ARM[i][WRIST[0]][WRIST[1]]);
+  myservo[3].write(CLAW[clawIndex]);
   update = false;
 }
 
@@ -275,21 +285,23 @@ void writeServos()
 //RETURNS:    None.
 void loop()
 {
-	delay(15); // Delay function to slow movement of arm down
+  delay(15); // Delay function to slow movement of arm down
 
-	if (debounce(DIG[0]) == 1)
-		toggleWrist(1);
+  if (debounce(DIG[0]) == 1)
+    toggleWrist(1);
 
-	if (debounce(DIG[1]) == 1)
-		toggleClaw();
+  if (debounce(DIG[1]) == 1)
+    toggleClaw();
 
-	if (debounce(DIG[2]) == 1)
-		toggleOn();
+  if (debounce(DIG[2]) == 1)
+    toggleOn();
 
-	basePos(analogRead(ANA[1]));
-	horzPos(analogRead(ANA[0]));
+  int temp = analogRead(ANA[1]);
+  basePos(temp);
+  temp = analogRead(ANA[0]);
+  horzPos(temp);
 
   if (update)
-	  writeServos();
+    writeServos();
 
 }
